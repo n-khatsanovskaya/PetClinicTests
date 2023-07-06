@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "error": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    },
+    "schemaValidationErrors": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "status": {
+      "type": "integer"
+    },
+    "timestamp": {
+      "type": "string"
+    },
+    "trace": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "error",
+    "message",
+    "path",
+    "schemaValidationErrors",
+    "status",
+    "timestamp",
+    "trace"
+  ]
+}
