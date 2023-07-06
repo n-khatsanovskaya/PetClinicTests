@@ -13,6 +13,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <allure.version>2.22.2</allure.version>
         <aspectj.version>1.9.19</aspectj.version>
+        <suit_name>suite.xml</suit_name>
     </properties>
     <dependencies>
         <dependency>
@@ -83,11 +84,11 @@
             <artifactId>allure-rest-assured</artifactId>
             <version>${allure.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.7.30</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.slf4j</groupId>-->
+<!--            <artifactId>slf4j-simple</artifactId>-->
+<!--            <version>1.7.30</version>-->
+<!--        </dependency>-->
     </dependencies>
     <build>
         <plugins>
@@ -100,6 +101,9 @@
                     <argLine>
                         -javaagent:${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar
                     </argLine>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/test/resources/${suit_name}</suiteXmlFile>
+                    </suiteXmlFiles>
                 </configuration>
                 <dependencies>
                     <!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->

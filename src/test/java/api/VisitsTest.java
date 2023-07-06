@@ -19,7 +19,7 @@ import java.util.List;
 public class VisitsTest {
   ServiceHelper serviceHelper = new ServiceHelper();
 
-  @Test(description = "Get the list of all visits")
+  @Test(description = "TC6 Get the list of all visits")
   public void getVisitsTest() {
     List<VisitsResponse> visits = serviceHelper.getVisits();
     Assertions.assertThat(visits).as("Visits response").isNotEmpty();
@@ -36,7 +36,7 @@ public class VisitsTest {
     };
   }
 
-  @Test(description = "Add new visit", dataProvider = "visitData")
+  @Test(description = "TC7 Create a visit", dataProvider = "visitData")
   public void createVisitTest(VisitsRequest body) {
     VisitsResponse visit = serviceHelper.addVisit(body);
     Assertions.assertThat(visit.getPetId()).as("Pet id").isEqualTo(body.getPetId());
@@ -45,11 +45,13 @@ public class VisitsTest {
   @DataProvider
   public Object[][] visitDataMissingRequiredFields() {
     return new Object[][] {
+        //TC8 Create a visit: missing required field id
         {new VisitsRequest(
             String.valueOf(LocalDate.now()),
             "new visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
             null,
             1), "must not be null"},
+        //TC8 Create a visit: missing required field description
         {new VisitsRequest(
             String.valueOf(LocalDate.now()),
             null,
@@ -58,7 +60,7 @@ public class VisitsTest {
     };
   }
 
-  @Test(description = "Add new visit unsuccessfull", dataProvider = "visitDataMissingRequiredFields")
+  @Test(description = "TC8 Create a visit: missing required filed", dataProvider = "visitDataMissingRequiredFields")
   public void createVisitUnsuccessfullTest(VisitsRequest body, String error) {
     Response response = serviceHelper.addVisitUnsuccessfull(body);
     //According to spec should check the response body
@@ -72,11 +74,13 @@ public class VisitsTest {
   @DataProvider
   public Object[][] petVisitData() {
     return new Object[][] {
+        //TC1 Add a vet visit: all parameters have valid values
         {new VisitsRequest(
             String.valueOf(LocalDate.now()),
             "new visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
             null,
             null), "1"},
+        //TC5 Add a vet visit: missing optional field date
         {new VisitsRequest(
             null,
             "new visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
@@ -85,13 +89,14 @@ public class VisitsTest {
     };
   }
 
-  @Test(description = "Add new visit", dataProvider = "petVisitData")
+  @Test(description = "TC1 TC5 Add a vet visit", dataProvider = "petVisitData")
   public void createPetVisitTest(VisitsRequest body, String petId) {
+    //TODO: check null data doesn't affect the DB
     VisitsResponse visit = serviceHelper.addPetVisit(petId, "1", body);
     Assertions.assertThat(visit.convertToMap()).as("Response body").containsAllEntriesOf(body.convertToMap());
   }
 
-  @Test(description = "Delete visit", dataProvider = "petVisitData")
+  @Test(description = "TC19 Delete visit", dataProvider = "petVisitData")
   public void deleteVisitTest (VisitsRequest body, String petId) {
 
     VisitsResponse visit = serviceHelper.addPetVisit(petId, "1", body);
@@ -103,19 +108,21 @@ public class VisitsTest {
     serviceHelper.getVisitByIdFailedResponse(visitId, 404);
   }
 
-  @Test(description = "Delete visit")
+  @Test(description = "TC20 Delete a visit by ID: not existing visit id")
   public void deleteVisitUnsuccessfullTest() {
-    serviceHelper.deleteVisitUnsuccessfull("100");
+    serviceHelper.deleteVisit("100", 400);
   }
 
   @DataProvider
   public Object[][] petVisitDataUnsuccessfull() {
     return new Object[][] {
+        //TC2 Add a vet visit: not existing pet
         {new VisitsRequest(
             String.valueOf(LocalDate.now()),
             "new visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
             null,
             null), "100", 404, "TBD"},
+        //TC4 Adds a vet visit: missing required field description
         {new VisitsRequest(
             String.valueOf(LocalDate.now()),
             null,
@@ -124,18 +131,18 @@ public class VisitsTest {
     };
   }
 
-  @Test(description = "Add new visit unsuccessfull", dataProvider = "petVisitDataUnsuccessfull")
+  @Test(description = "TC2 TC4 Add a vet visit: unsuccessfull", dataProvider = "petVisitDataUnsuccessfull")
   public void createPetVisitUnsuccessfullTest(VisitsRequest body, String petId, Integer status, String error) {
     Response response = serviceHelper.addPetVisitUnsuccessfull(petId, "1", body, status);
     //According to spec should check the response body
     //response.then().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponse.json"));
-    //TODO: check desired field
+    //TODO: check error message
     Assertions.assertThat(response.getBody().toString()
             .contains(error))
         .as("Response error message").isTrue();
     }
 
-  @Test(description = "Get visit by id")
+  @Test(description = "TC10 Get visit by id")
   public void getVisitByIdTest() {
     String id = "7";
     VisitsResponse visit = serviceHelper.getVisitById(id);
@@ -145,80 +152,108 @@ public class VisitsTest {
   @DataProvider
   public Object[][] visitIdsFailed() {
     return new Object[][] {
+        //TC11 Get a visit by ID: invalid parameter value
+        //TC12 Get a visit by ID: not existing visit id
         {"700", 404}, {"string", 400}
     };
   }
 
-  @Test(description = "Get visit by id", dataProvider = "visitIdsFailed")
+  @Test(description = "TC11 TC12 Get visit by id unsuccessfull", dataProvider = "visitIdsFailed")
   public void getVisitByIdUnsuccessfulTest(String id, Integer code) {
     Response response = serviceHelper.getVisitByIdFailedResponse(id, code);
-    //TODO: check response structure
+    //According to spec should check the response body
+    //response.then().body(JsonSchemaValidator.matchesJsonSchemaInClasspath("ErrorResponse.json"));
+    //TODO: check error message
+    Assertions.assertThat(response.getBody().toString()
+            .contains("error"))
+        .as("Response error message").isTrue();
   }
 
   @DataProvider
   public Object[][] visitDataUpdate() {
     return new Object[][] {
+        //TC13 Update a visit by ID
         {new VisitsRequest(
             String.valueOf(LocalDate.now()),
             "updated visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
             7,
-            10)}
+            10)},
+          //TC17 Update a visit by ID: missing optional field date
+        {new VisitsRequest(
+            null,
+            "updated visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
+            7,
+            10)
+      }
     };
   }
 
-  @Test(description = "Update visit", dataProvider = "visitDataUpdate")
+  @Test(description = "TC13 TC17 Update a visit by ID", dataProvider = "visitDataUpdate")
   public void updateVisitTest(VisitsRequest body) {
+    //TODO: check null data doesn't affect the DB
     serviceHelper.updateVisitResponse(body.getId().toString(), body, 204);
     VisitsResponse visit = serviceHelper.getVisitById(body.getId().toString());
-    Assertions.assertThat(visit.convertToMap()).as("Visit data").containsAllEntriesOf(body.convertToMap());
+    Assertions.assertThat(visit.convertToMap()).as("Visit data").containsExactlyInAnyOrderEntriesOf(body.convertToMap());
   }
 
   @DataProvider
   public Object[][] visitDataUpdateUnsuccessfull() {
     return new Object[][] {
-        {"700",
-          new VisitsRequest(
+        //TC15 Update a visit by ID: not existing pet id
+        {new VisitsRequest(
             String.valueOf(LocalDate.now()),
             "updated visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
-            700,
-            10),
-          404},
-        {"7",
-          new VisitsRequest(
-            String.valueOf(LocalDate.now()),
-            "updated visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
-            7,
+            1,
             100),
           404}, //Not clear from documentation
-        {"7",
-          new VisitsRequest(
+        //TC16 Update a visit by ID: missing required field description
+        {new VisitsRequest(
             String.valueOf(LocalDate.now()),
             null,
-            7,
+            1,
             1),
           400},
-        {"7",
-          new VisitsRequest(
+        //TC16 Update a visit by ID: missing required field id
+        {new VisitsRequest(
             String.valueOf(LocalDate.now()),
             "updated visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
             null,
             1),
-          400},
-        {"7",
-            new VisitsRequest(
-                null,
-                "updated visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
-                7,
-                10),
-            204} //Should be 200
+          400}
     };
   }
 
-  @Test(description = "Update visit", dataProvider = "visitDataUpdateUnsuccessfull")
-  public void updateVisitUnsuccessfullTest(String visitId, VisitsRequest body, Integer code) {
-    //TODO: add checking of visit fields before and after updating
+  @Test(description = "TC15 TC16 Update a visit by id: unsuccessfull", dataProvider = "visitDataUpdateUnsuccessfull")
+  public void updateVisitUnsuccessfullTest(VisitsRequest body, Integer code) {
+    VisitsResponse visitBeforeUpdate = serviceHelper.addPetVisit();
+    VisitsResponse visit;
+    Integer visitId = visitBeforeUpdate.getId();
+    try {
+      serviceHelper.updateVisitResponse(visitId.toString(), body, code);
+      visit = serviceHelper.getVisitById(visitId.toString());
+      Assertions.assertThat(visit.convertToMap()).as("Visit data").containsExactlyInAnyOrderEntriesOf(visitBeforeUpdate.convertToMap());
+    }
+    catch(Exception e) {
+      throw new AssertionError(e.getMessage());
+    }
+    serviceHelper.deleteVisit(visitId.toString());
+  }
+
+  @DataProvider
+  public Object[][] visitNotExisitingData() {
+    return new Object[][] {
+        {"700",
+            new VisitsRequest(
+                String.valueOf(LocalDate.now()),
+                "updated visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
+                700,
+                10),
+            404}
+    };
+  }
+
+  @Test(description = "TC14 Update a visit by ID: not existing visit id", dataProvider = "visitNotExisitingData")
+  public void updateVisitIfDoesntExistTest(String visitId, VisitsRequest body, Integer code) {
     serviceHelper.updateVisitResponse(visitId, body, code);
-    VisitsResponse visit = serviceHelper.getVisitById(visitId);
-    Assertions.assertThat(visit.convertToMap()).as("Visit data").containsAllEntriesOf(body.convertToMap());
   }
 }

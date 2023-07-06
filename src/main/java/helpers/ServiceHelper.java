@@ -9,6 +9,9 @@ import io.restassured.response.Response;
 import models.request.VisitsRequest;
 import models.response.VisitsResponse;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -24,13 +27,6 @@ public class ServiceHelper extends RestAssuredClient {
     List<VisitsResponse> visits = get(PetClinicConfig.VISITS).as(new TypeRef<>() {});
     return visits;
   }
-
-//  @Step("Get visit by id")
-//  public VisitsResponse getVisitById(String id) {
-//    RestAssured.responseSpecification.expect().statusCode(200);
-//    VisitsResponse visit = get(PetClinicConfig.VISITS_ID, Map.of("visitId", id)).as(VisitsResponse.class);
-//    return visit;
-//  }
 
   @Step("Get visit by id")
   public VisitsResponse getVisitById(String id) {
@@ -73,6 +69,18 @@ public class ServiceHelper extends RestAssuredClient {
     return response.as(VisitsResponse.class);
   }
 
+  @Step("Add visit for pet with default parameters")
+  public VisitsResponse addPetVisit() {
+    VisitsRequest body = new VisitsRequest(
+        String.valueOf(LocalDate.now()),
+        "new visit " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd HH:mm:ss")),
+        null,
+        null);
+    Response response = post(PetClinicConfig.OWNERS_PETS_VISITS, Map.of("petId", "1", "ownerId", "1"), body);
+    response.then().statusCode(201);
+    return response.as(VisitsResponse.class);
+  }
+
   @Step("Add visit for pet unsuccessful")
   public Response addPetVisitUnsuccessfull(String petId, String ownerId, VisitsRequest body, Integer status) {
     Response response = post(PetClinicConfig.OWNERS_PETS_VISITS, Map.of("petId", petId, "ownerId", ownerId), body);
@@ -97,32 +105,18 @@ public class ServiceHelper extends RestAssuredClient {
 
   @Step("Delete visit")
   public VisitsResponse deleteVisit(String id) {
+    return deleteVisit(id, 204);
+  }
+
+  public VisitsResponse deleteVisit(String id, Integer code) {
     try {
       Response response = delete(PetClinicConfig.VISITS_ID, Map.of("visitId", id));
-      response.then().statusCode(204);
+      response.then().statusCode(code);
       VisitsResponse visit = response.as(VisitsResponse.class);
       return visit;
     }
     catch (IllegalStateException e) {
       return null;
     }
-  }
-
-  @Step("Delete visit")
-  public VisitsResponse deleteVisitUnsuccessfull(String id) {
-    try {
-      Response response = delete(PetClinicConfig.VISITS_ID, Map.of("visitId", id));
-      response.then().statusCode(404);
-      VisitsResponse visit = response.as(VisitsResponse.class);
-      return visit;
-    }
-    catch (IllegalStateException e) {
-      return null;
-    }
-  }
-
-  public boolean checkVisitData(VisitsRequest request, VisitsResponse response) {
-
-    return true;
   }
 }
