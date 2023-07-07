@@ -3,7 +3,6 @@ package client;
 import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -19,10 +18,6 @@ public abstract class RestAssuredClient {
 
     RestAssured.requestSpecification = new RequestSpecBuilder()
         .addFilter(new ResponseLoggingFilter())
-        .build();
-
-    RestAssured.responseSpecification = new ResponseSpecBuilder()
-//        .expectResponseTime(lessThan(1000L))
         .build();
 
     RestAssured.filters(new AllureRestAssured());

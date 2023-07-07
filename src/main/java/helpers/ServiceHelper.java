@@ -23,9 +23,9 @@ public class ServiceHelper extends RestAssuredClient {
 
   @Step("Get visits")
   public List<VisitsResponse> getVisits() {
-    RestAssured.responseSpecification.expect().statusCode(200);
-    List<VisitsResponse> visits = get(PetClinicConfig.VISITS).as(new TypeRef<>() {});
-    return visits;
+    Response response = get(PetClinicConfig.VISITS);
+    response.then().statusCode(200);
+    return response.as(new TypeRef<>() {});
   }
 
   @Step("Get visit by id")

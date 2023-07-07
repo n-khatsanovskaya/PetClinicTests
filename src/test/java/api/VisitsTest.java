@@ -13,9 +13,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-//TODO:
-// Add suites support in pom.xml
-
 public class VisitsTest {
   ServiceHelper serviceHelper = new ServiceHelper();
 
@@ -39,7 +36,7 @@ public class VisitsTest {
   @Test(description = "TC7 Create a visit", dataProvider = "visitData")
   public void createVisitTest(VisitsRequest body) {
     VisitsResponse visit = serviceHelper.addVisit(body);
-    Assertions.assertThat(visit.getPetId()).as("Pet id").isEqualTo(body.getPetId());
+    Assertions.assertThat(visit.convertToMap()).as("Pet id").containsAllEntriesOf(body.convertToMap());
   }
 
   @DataProvider
@@ -144,7 +141,7 @@ public class VisitsTest {
 
   @Test(description = "TC10 Get visit by id")
   public void getVisitByIdTest() {
-    String id = "7";
+    String id = "1";
     VisitsResponse visit = serviceHelper.getVisitById(id);
     Assertions.assertThat(visit.getId().toString()).isEqualTo(id);
   }
