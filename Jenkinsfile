@@ -18,7 +18,7 @@ pipeline {
                             sh 'mvn clean test'
                         }
                     } catch (Exception e) {
-                        unstable("There were test failures.")
+                        error("There were test failures.")
                     }
                 }
            }
@@ -27,7 +27,13 @@ pipeline {
         stage('Generate Allure Report') {
             steps {
                 // Generate Allure report
-                sh 'mvn allure:report'
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    properties: [],
+                    reportBuildPolicy: 'ALWAYS',
+                    results: [[path: 'target/allure-results']]
+                ])
             }
         }
 
