@@ -10,15 +10,7 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                withMaven(maven: 'Maven3') {
-                    sh 'mvn install'
-                }
-            }
-        }
-
-        stage('Test') {
+        stage('Build and Test') {
             steps {
                 script {
                     try {
