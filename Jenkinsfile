@@ -11,9 +11,21 @@ pipeline {
         }
 
         stage('Build') {
-            steps {
+            script {
                 withMaven(maven: 'Maven3') {
+                    sh 'mvn install'
+                }
+            }
+        }
+
+        stage('Test') {
+            script {
+                try {
+                    withMaven(maven: 'Maven3') {
                         sh 'mvn clean test'
+                    }
+                } catch (Exception e) {
+                    unstable("There were test failures.")
                 }
             }
         }
