@@ -27,7 +27,7 @@ pipeline {
         stage('Generate Allure Report') {
             steps {
                 // Generate Allure report
-                sh 'allure generate target/allure-results --clean -o target/allure-report'
+                sh 'mvn allure:report'
             }
         }
 
