@@ -23,25 +23,20 @@ pipeline {
                 }
            }
         }
+    }
+    post {
+        always {
+            // Archive Allure results as artifacts
+            archiveArtifacts 'target/allure-results/**'
 
-        stage('Generate Allure Report') {
-            steps {
-                // Generate Allure report
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    properties: [],
-                    reportBuildPolicy: 'ALWAYS',
-                    results: [[path: 'target/allure-results']]
-                ])
-            }
-        }
-
-        stage('Publish Allure Report') {
-            steps {
-                // Publish Allure report as a Jenkins artifact
-                archiveArtifacts 'target/allure-report'
-            }
+            // Publish Allure report using the Allure Jenkins Plugin
+            allure([
+                includeProperties: false,
+                jdk: '',
+                properties: [],
+                reportBuildPolicy: 'ALWAYS',
+                results: [[path: 'target/allure-results']]
+            ])
         }
     }
 }
