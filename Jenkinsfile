@@ -11,7 +11,7 @@ pipeline {
         }
 
         stage('Build') {
-            script {
+            steps {
                 withMaven(maven: 'Maven3') {
                     sh 'mvn install'
                 }
@@ -19,15 +19,17 @@ pipeline {
         }
 
         stage('Test') {
-            script {
-                try {
-                    withMaven(maven: 'Maven3') {
-                        sh 'mvn clean test'
+            steps {
+                script {
+                    try {
+                        withMaven(maven: 'Maven3') {
+                            sh 'mvn clean test'
+                        }
+                    } catch (Exception e) {
+                        unstable("There were test failures.")
                     }
-                } catch (Exception e) {
-                    unstable("There were test failures.")
                 }
-            }
+           }
         }
 
         stage('Generate Allure Report') {
