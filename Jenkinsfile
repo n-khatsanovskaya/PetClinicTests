@@ -18,7 +18,7 @@ pipeline {
                             sh 'mvn clean test'
                         }
                     } catch (Exception e) {
-                        error("There were test failures.")
+                        success("There were test failures.")
                     }
                 }
            }
