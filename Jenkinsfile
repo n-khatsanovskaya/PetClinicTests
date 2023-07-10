@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git checkout 'https://github.com/n-khatsanovskaya/PetClinicTests.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean test'
+            }
+        }
+
+        stage('Generate Allure Report') {
+            steps {
+                // Generate Allure report
+                sh 'allure generate target/allure-results --clean -o target/allure-report'
+            }
+        }
+
+        stage('Publish Allure Report') {
+            steps {
+                // Publish Allure report as a Jenkins artifact
+                archiveArtifacts 'target/allure-report'
+            }
+        }
+    }
+}

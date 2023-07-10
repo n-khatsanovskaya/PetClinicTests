@@ -3,7 +3,6 @@ package helpers;
 import client.RestAssuredClient;
 import config.PetClinicConfig;
 import io.qameta.allure.Step;
-import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.Response;
 import models.request.VisitsRequest;
