@@ -15,7 +15,7 @@ pipeline {
                 script {
                     try {
                         withMaven(maven: 'Maven3') {
-                            sh 'mvn clean test'
+                            sh 'mvn clean test -Dbase.url=${baseUrl} -Dsuite=\"${suite}.xml\"'
                         }
                     } catch (Exception e) {
                         currentBuild.result = 'SUCCESS'
