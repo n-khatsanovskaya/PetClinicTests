@@ -23,20 +23,16 @@ pipeline {
                 }
            }
         }
-    }
-    post {
-        always {
-            // Archive Allure results as artifacts
-            archiveArtifacts 'target/allure-results/**'
-
-            // Publish Allure report using the Allure Jenkins Plugin
+        stage('Allure Report') {
+        new Reports(this).addAllureEnvironment('target/allure-results')
             allure([
-                includeProperties: false,
-                jdk: '',
-                properties: [],
-                reportBuildPolicy: 'ALWAYS',
-                results: [[path: 'target/allure-results']]
-            ])
+                    includeProperties: false,
+                    jdk: '',
+                    properties: [],
+                    reportBuildPolicy: 'ALWAYS',
+                    results: [[path: 'target/allure-results']]
+                ])
+            }
         }
     }
 }
