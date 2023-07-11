@@ -20,7 +20,7 @@ pipeline {
                     } catch (Exception e) {
                         currentBuild.result = 'SUCCESS'
                     }
-                    echo 'build status: $currentBuild.result'
+                    echo "build status: ${currentBuild.result}"
                 }
            }
         }
