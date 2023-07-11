@@ -24,7 +24,6 @@ pipeline {
            }
         }
         stage('Allure Report') {
-            new Reports(this).addAllureEnvironment('target/allure-results')
             allure([
                     includeProperties: false,
                     jdk: '',
